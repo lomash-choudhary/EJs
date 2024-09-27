@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List</title>
+  <link rel = "stylesheet" href = "/stylesheets/style.css">
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+</head>
+<body> 
+  <div class = "main-div">
+    <h1 class = "h1tag">Todo List</h1>
+    <p class = "currentDate"><%= currentDate %></p>
+    <ul>
+      <% for(i = 0; i < newItems.length; i++){ %>
+        <li class = "listItems">
+          <input type="checkbox" onchange = "deleteTodo('<%= i %>')" > <%= newItems[i] %>
+          <button onclick = "showEditFields('<%= i %>', '<%= newItems[i] %>')">Edit</button>
+        </li>
+      <% } %>
+      
+      <form action="/" method = "POST">
+        <input type = "text" placeholder = "enter the todo" name = "newItem" autocomplete="off">
+        <button class = "submitButton" type="submit">+</button>
+      </form>
+    </ul>
+  </div>
+  <script>
+    async function deleteTodo(index){
+      const response = await axios.delete(`/delete/${index}`)
+      if(response){
+        window.location.reload();
+      }
+      else{
+        alert("error occured in deleteing the todo")
+      }
+    }
+    async function showEditFields(index, currentTodo){
+      const updatedTodo = prompt("Edit your Todo:", currentTodo);
+      if(updatedTodo === null || updatedTodo.trim() === ""){
+        return;
+      }
+      try{
+        const response = await axios.put(`/update/${index}`, {
+          newItem: updatedTodo
+        })
+        if(response.status === 200){
+          window.location.reload();
+        }
+        else{
+          alert("error occured while udpating the todo")
+        }
+      }
+      catch(err){
+        throw new Error("todo can not be updated");
+      }
+    }
+  </script>
+</body>
+</html>
